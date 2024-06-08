@@ -4,7 +4,7 @@
 #include <string.h>
 
 // If you want to see the debug messages, let the line below uncommented
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 #define pdebug printf
 #else
@@ -12,9 +12,48 @@
 #endif
 
 
+struct FCFS
+{
+    char p[100];
+    int t;
+    int t_wait;
+};
+
 void FCFS(char *file_in)
 {
-    pdebug("FCFS\n");
+    printf("FCFS\n");
+
+    /*** READ FILE ***/
+    FILE *input_arq;
+
+    input_arq = fopen(file_in, "r");
+    if (input_arq == NULL)
+    {
+        printf("Erro ao abrir o arquivo de entrada %s.\n", file_in);
+        exit(1);
+    }
+
+    int n;
+    fscanf(input_arq, "%d", &n);
+
+    struct FCFS *process = (struct FCFS *) malloc(n * sizeof(struct FCFS));
+    for (int i = 0; i < n; i++)
+    {
+        fscanf(input_arq, "%s %d", process[i].p, &process[i].t);
+        if (i == 0)
+            process[i].t_wait = 0;
+        else
+            process[i].t_wait = process[i - 1].t + process[i - 1].t_wait;
+    }
+
+    fclose(input_arq);
+
+    // Print the process
+    printf("Processo | Tempo_de_Chegada | Tempo_de_Execucao\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("   %s    |        %d        |         %d       \n", process[i].p, process[i].t, process[i].t_wait);
+    }
 }
 
 void SJF(char *file_in)
